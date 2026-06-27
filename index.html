@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ERP 使用手册</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-soft: #f1f5f3;
+      --ink: #172026;
+      --muted: #66737d;
+      --line: #d9e0e4;
+      --accent: #0f766e;
+      --accent-strong: #0b5f59;
+      --accent-soft: #e1f1ee;
+      --warn: #b45309;
+      --shadow: 0 16px 42px rgba(23, 32, 38, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      border-right: 1px solid var(--line);
+      background: #fbfcfc;
+      padding: 24px 18px;
+    }
+
+    .brand {
+      display: grid;
+      gap: 8px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .search {
+      margin: 18px 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .search label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .search input {
+      width: 100%;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 12px;
+      font: inherit;
+      background: var(--surface);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .search input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, .14);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .category-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .category-button {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font: 700 14px/1.35 inherit;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .category-button:hover,
+    .category-button.active {
+      background: var(--accent-soft);
+      border-color: #b7dcd5;
+      color: var(--accent-strong);
+    }
+
+    .category-button small {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 28px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: end;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 22px;
+      margin-bottom: 22px;
+    }
+
+    .hero h2 {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      max-width: 860px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      padding: 8px 12px;
+      font: 700 14px/1 inherit;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 440px) minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .guide-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .guide-card {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 14px;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: none;
+    }
+
+    .guide-card:hover,
+    .guide-card.active {
+      border-color: #94c7bf;
+      box-shadow: var(--shadow);
+    }
+
+    .guide-card strong {
+      display: block;
+      font-size: 15px;
+      line-height: 1.45;
+      margin-bottom: 8px;
+    }
+
+    .guide-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: #43515a;
+      font-weight: 700;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 18px 18px 16px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .panel-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .panel-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .toc a {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 10px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      background: #fff;
+    }
+
+    .screens {
+      padding: 18px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .empty {
+      padding: 24px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .step-title {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fafafa;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .step-title span {
+      flex: 0 0 auto;
+      min-width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      display: inline-grid;
+      place-items: center;
+      font-size: 14px;
+    }
+
+    .step img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #eef1f3;
+    }
+
+    .markdown-link {
+      color: var(--accent-strong);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .notice {
+      border: 1px solid #f3d6a6;
+      background: #fff8ed;
+      color: #71440b;
+      border-radius: 8px;
+      padding: 12px 14px;
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+
+    .loading {
+      color: var(--muted);
+      padding: 20px 0;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 1120px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        height: auto;
+      }
+      .layout { grid-template-columns: 1fr; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-actions { justify-content: flex-start; }
+    }
+
+    @media (max-width: 640px) {
+      .main,
+      .sidebar { padding: 18px; }
+      .hero h2 { font-size: 26px; }
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>ERP 使用手册</h1>
+        <p>按功能模块和业务流程整理的截图教程。每个教程保留原始 README，并在本页集中展示操作步骤截图。</p>
+      </div>
+
+      <div class="search">
+        <label for="searchInput">搜索功能、模块或步骤</label>
+        <input id="searchInput" type="search" placeholder="例如：销售合同、版辊、收款、库存" autocomplete="off" />
+      </div>
+
+      <div class="stats" aria-live="polite">
+        <div class="stat"><strong id="guideCount">0</strong><span>教程</span></div>
+        <div class="stat"><strong id="shotCount">0</strong><span>截图</span></div>
+      </div>
+
+      <nav id="categoryList" class="category-list" aria-label="手册分类"></nav>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div>
+          <h2>系统使用手册导航</h2>
+          <p>先从左侧选择模块，再在功能列表里打开具体教程。右侧会展示该教程的逐步截图；需要完整字段说明、常见错误和检查清单时，可打开对应 README。</p>
+        </div>
+        <div class="hero-actions">
+          <a class="button" href="./guides/README.md">打开 guides 目录</a>
+          <button class="button primary" id="expandFirst">打开第一个教程</button>
+        </div>
+      </section>
+
+      <div class="notice">
+        本网页只包含 `guides/` 中的使用手册和截图，不包含主系统源码、环境变量、部署配置或业务数据库。
+      </div>
+
+      <div class="layout">
+        <section>
+          <div id="loading" class="loading">正在读取 guides 目录...</div>
+          <div id="guideList" class="guide-list"></div>
+        </section>
+
+        <section id="detail" class="panel">
+          <div class="empty">请选择左侧功能，查看该教程的步骤截图。</div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const categoryNames = {
+      'login': '登录与账号',
+      'workbench': '工作台',
+      'master-data': '基础资料总览',
+      'sales-quotation-contract': '销售流程总览',
+      'sales-to-purchase': '销售到采购总览',
+      'procurement-inventory': '采购与库存总览',
+      'finance-invoices-payments': '财务流程总览',
+      'core-dashboards': '看板报表总览',
+      'collaboration-admin': '协作与管理总览',
+      'exceptions-reports': '例外业务总览',
+      '基础资料': '基础资料',
+      '销售管理': '销售管理',
+      '采购管理': '采购管理',
+      '库存管理': '库存管理',
+      '财务管理': '财务管理',
+      '看板报表': '看板报表',
+      '文档管理': '文档管理',
+      '系统管理': '系统管理',
+      '资料管理': '资料管理',
+      '版辊管理': '版辊管理',
+    }
+
+    const state = {
+      guides: [],
+      filtered: [],
+      category: '全部',
+      query: '',
+      selectedPath: '',
+    }
+
+    const guideList = document.querySelector('#guideList')
+    const categoryList = document.querySelector('#categoryList')
+    const detail = document.querySelector('#detail')
+    const loading = document.querySelector('#loading')
+    const searchInput = document.querySelector('#searchInput')
+    const guideCount = document.querySelector('#guideCount')
+    const shotCount = document.querySelector('#shotCount')
+    const expandFirst = document.querySelector('#expandFirst')
+
+    init().catch((error) => {
+      loading.textContent = `读取手册失败：${error.message}`
+      console.error(error)
+    })
+
+    async function init() {
+      const rootMarkdown = await fetchText('./guides/README.md')
+      const links = parseLinks(rootMarkdown)
+        .filter((link) => !isExternal(link.href))
+        .map((link) => {
+          const path = normalizeGuidePath(link.href)
+          return { ...link, path }
+        })
+        .filter((link) => link.path && !link.path.endsWith('/'))
+
+      const unique = Array.from(new Map(links.map((link) => [link.path, link])).values())
+      const guides = await Promise.all(unique.map(loadGuide))
+      state.guides = guides.filter(Boolean)
+      state.filtered = state.guides
+      guideCount.textContent = String(state.guides.length)
+      shotCount.textContent = String(state.guides.reduce((sum, guide) => sum + guide.screenshots.length, 0))
+      loading.remove()
+      renderCategories()
+      renderGuideList()
+      selectFromHash()
+    }
+
+    async function loadGuide(link) {
+      try {
+        const markdown = await fetchText(link.path)
+        const title = firstHeading(markdown) || link.title
+        const intro = firstParagraph(markdown)
+        const screenshots = parseScreenshots(markdown, link.path)
+        const headings = parseHeadings(markdown)
+        return {
+          title,
+          linkTitle: link.title,
+          intro,
+          path: link.path,
+          category: categoryFor(link.path),
+          screenshots,
+          headings,
+          markdown,
+          searchable: `${title} ${link.title} ${link.path} ${intro} ${headings.join(' ')}`.toLowerCase(),
+        }
+      } catch (error) {
+        return {
+          title: link.title,
+          linkTitle: link.title,
+          intro: '该文档无法读取，请直接打开 README 查看。',
+          path: link.path,
+          category: categoryFor(link.path),
+          screenshots: [],
+          headings: [],
+          markdown: '',
+          searchable: `${link.title} ${link.path}`.toLowerCase(),
+          error: error.message,
+        }
+      }
+    }
+
+    function parseLinks(markdown) {
+      return Array.from(markdown.matchAll(/\[([^\]]+)\]\(([^)]+)\)/g)).map((match) => ({
+        title: cleanup(match[1]),
+        href: cleanup(match[2]),
+      }))
+    }
+
+    function parseScreenshots(markdown, markdownPath) {
+      const base = new URL(markdownPath, window.location.href)
+      return Array.from(markdown.matchAll(/!\[([^\]]*)\]\(([^)]+)\)/g)).map((match, index) => ({
+        title: cleanup(match[1]) || `步骤 ${String(index + 1).padStart(2, '0')}`,
+        src: new URL(cleanup(match[2]), base).href,
+      }))
+    }
+
+    function parseHeadings(markdown) {
+      return Array.from(markdown.matchAll(/^#{2,4}\s+(.+)$/gm)).map((match) => cleanup(match[1])).slice(0, 12)
+    }
+
+    function firstHeading(markdown) {
+      const match = markdown.match(/^#\s+(.+)$/m)
+      return match ? cleanup(match[1]) : ''
+    }
+
+    function firstParagraph(markdown) {
+      const lines = markdown
+        .split(/\n+/)
+        .map((line) => cleanup(line))
+        .filter((line) => line && !line.startsWith('#') && !line.startsWith('- ') && !line.startsWith('|') && !line.startsWith('!['))
+      return lines[0] || ''
+    }
+
+    function categoryFor(markdownPath) {
+      const clean = markdownPath.replace(/^\.?\//, '').replace(/^guides\//, '')
+      const first = clean.split('/')[0]
+      if (/^\d{2}-/.test(first) || first.endsWith('.md')) return '系统说明'
+      return categoryNames[first] || first || '其他'
+    }
+
+    function normalizeGuidePath(href) {
+      const clean = href.split('#')[0].replace(/^\.\//, '')
+      if (!clean || isExternal(clean)) return ''
+      return `guides/${clean}`
+    }
+
+    function isExternal(href) {
+      return /^[a-z]+:/i.test(href) || href.startsWith('//')
+    }
+
+    function renderCategories() {
+      const counts = new Map()
+      for (const guide of state.guides) counts.set(guide.category, (counts.get(guide.category) || 0) + 1)
+      const categories = ['全部', ...Array.from(counts.keys()).sort((a, b) => a.localeCompare(b, 'zh-CN'))]
+      categoryList.innerHTML = categories.map((category) => {
+        const count = category === '全部' ? state.guides.length : counts.get(category)
+        return `<button class="category-button${state.category === category ? ' active' : ''}" data-category="${escapeHtml(category)}"><span>${escapeHtml(category)}</span><small>${count}</small></button>`
+      }).join('')
+      categoryList.querySelectorAll('button').forEach((button) => {
+        button.addEventListener('click', () => {
+          state.category = button.dataset.category
+          applyFilters()
+        })
+      })
+    }
+
+    function applyFilters() {
+      const query = state.query.trim().toLowerCase()
+      state.filtered = state.guides.filter((guide) => {
+        const categoryMatch = state.category === '全部' || guide.category === state.category
+        const queryMatch = !query || guide.searchable.includes(query)
+        return categoryMatch && queryMatch
+      })
+      renderCategories()
+      renderGuideList()
+    }
+
+    function renderGuideList() {
+      if (!state.filtered.length) {
+        guideList.innerHTML = '<div class="empty">没有匹配的教程。</div>'
+        return
+      }
+      guideList.innerHTML = state.filtered.map((guide) => `
+        <button class="guide-card${state.selectedPath === guide.path ? ' active' : ''}" data-path="${escapeHtml(guide.path)}">
+          <strong>${escapeHtml(guide.title)}</strong>
+          <span class="guide-meta">
+            <span class="pill">${escapeHtml(guide.category)}</span>
+            <span>${guide.screenshots.length} 张截图</span>
+            <span>${escapeHtml(shortPath(guide.path))}</span>
+          </span>
+        </button>
+      `).join('')
+      guideList.querySelectorAll('.guide-card').forEach((card) => {
+        card.addEventListener('click', () => selectGuide(card.dataset.path))
+      })
+    }
+
+    function selectGuide(path) {
+      const guide = state.guides.find((item) => item.path === path)
+      if (!guide) return
+      state.selectedPath = path
+      window.history.replaceState(null, '', `#${encodeURIComponent(path)}`)
+      renderGuideList()
+      renderDetail(guide)
+    }
+
+    function renderDetail(guide) {
+      const toc = guide.headings.length
+        ? `<div class="toc">${guide.headings.map((heading) => `<a href="${escapeHtml(guide.path)}">${escapeHtml(heading)}</a>`).join('')}</div>`
+        : ''
+      const screenshots = guide.screenshots.length
+        ? guide.screenshots.map((shot, index) => `
+          <article class="step" id="step-${index + 1}">
+            <div class="step-title"><span>${String(index + 1).padStart(2, '0')}</span>${escapeHtml(shot.title)}</div>
+            <img src="${escapeHtml(shot.src)}" alt="${escapeHtml(shot.title)}" loading="lazy" />
+          </article>
+        `).join('')
+        : '<div class="empty">该教程没有截图，点击 README 查看文字说明。</div>'
+
+      detail.innerHTML = `
+        <div class="panel-head">
+          <div>
+            <h3>${escapeHtml(guide.title)}</h3>
+            <p>${escapeHtml(guide.intro || '打开 README 查看完整操作说明。')}</p>
+          </div>
+          <div class="panel-actions">
+            <a class="button primary" href="${escapeHtml(guide.path)}">打开 README</a>
+            <a class="button" href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">回到顶部</a>
+            <span class="pill">${escapeHtml(guide.category)}</span>
+            <span class="pill">${guide.screenshots.length} 张截图</span>
+          </div>
+          ${toc}
+        </div>
+        <div class="screens">${screenshots}</div>
+      `
+    }
+
+    function selectFromHash() {
+      const hash = decodeURIComponent(window.location.hash.replace(/^#/, ''))
+      const target = state.guides.find((guide) => guide.path === hash) || state.guides[0]
+      if (target) selectGuide(target.path)
+    }
+
+    async function fetchText(url) {
+      const response = await fetch(url)
+      if (!response.ok) throw new Error(`${url} ${response.status}`)
+      return response.text()
+    }
+
+    function cleanup(value) {
+      return String(value || '').replace(/`/g, '').trim()
+    }
+
+    function shortPath(value) {
+      return value.replace(/^guides\//, '')
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+    }
+
+    searchInput.addEventListener('input', () => {
+      state.query = searchInput.value
+      applyFilters()
+    })
+
+    expandFirst.addEventListener('click', () => {
+      const first = state.filtered[0] || state.guides[0]
+      if (first) selectGuide(first.path)
+    })
+  </script>
+</body>
+</html>
