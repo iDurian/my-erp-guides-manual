@@ -482,6 +482,106 @@
       line-height: 1.8;
     }
 
+    body.manual-locked {
+      overflow: hidden;
+    }
+
+    body.manual-locked .shell {
+      visibility: hidden;
+    }
+
+    .auth-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background:
+        linear-gradient(120deg, rgba(15, 118, 110, .14), transparent 34%),
+        linear-gradient(300deg, rgba(23, 32, 38, .1), transparent 42%),
+        #f6f7f9;
+    }
+
+    body.manual-locked .auth-gate {
+      display: grid;
+    }
+
+    .auth-card {
+      width: min(100%, 420px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .auth-card h2 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .auth-card p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .auth-form label {
+      color: #314047;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .auth-form input {
+      width: 100%;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 12px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+    }
+
+    .auth-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, .14);
+    }
+
+    .auth-error {
+      min-height: 20px;
+      margin: 0;
+      color: #b42318;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .auth-submit {
+      height: 44px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: 800 14px/1 inherit;
+      cursor: pointer;
+    }
+
+    .auth-submit:hover {
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+    }
+
     @media (max-width: 1120px) {
       .shell { grid-template-columns: 1fr; }
       .sidebar {
@@ -505,7 +605,20 @@
     }
   </style>
 </head>
-<body>
+<body class="manual-locked">
+  <div class="auth-gate" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <form class="auth-card auth-form" id="authForm">
+      <div>
+        <h2 id="authTitle">访问 ERP 使用手册</h2>
+        <p>请输入手册访问密码。通过后可在当前浏览器标签页内查看所有教程。</p>
+      </div>
+      <label for="manualPassword">访问密码</label>
+      <input id="manualPassword" name="manualPassword" type="password" autocomplete="current-password" required />
+      <p class="auth-error" id="authError" aria-live="polite"></p>
+      <button class="auth-submit" type="submit">进入手册</button>
+    </form>
+  </div>
+
   <div class="shell">
     <aside class="sidebar">
       <div class="brand">
@@ -554,6 +667,46 @@
     </main>
   </div>
 
+  <script>
+    ;(() => {
+      const passwordHash = '368f9af71cdbce3ab9c4656df304e206d138a0777744378a74539fc24b7cd8c2'
+      const sessionKey = 'erpManualAccessGranted'
+      const form = document.querySelector('#authForm')
+      const input = document.querySelector('#manualPassword')
+      const error = document.querySelector('#authError')
+
+      if (sessionStorage.getItem(sessionKey) === '1') {
+        unlockManual()
+        return
+      }
+
+      window.addEventListener('load', () => input.focus())
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault()
+        error.textContent = ''
+        const value = input.value.trim()
+        if (!value) {
+          error.textContent = '请输入访问密码。'
+          input.focus()
+          return
+        }
+        const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
+        const hash = Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, '0')).join('')
+        if (hash !== passwordHash) {
+          error.textContent = '密码不正确，请重新输入。'
+          input.select()
+          return
+        }
+        sessionStorage.setItem(sessionKey, '1')
+        unlockManual()
+      })
+
+      function unlockManual() {
+        document.body.classList.remove('manual-locked')
+      }
+    })()
+  </script>
   <script id="manual-data" type="application/json">[
   {
     "title": "新用户 Onboarding 提纲",
